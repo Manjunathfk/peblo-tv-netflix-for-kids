@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: peblo
+      POSTGRES_USER: peblo
+      POSTGRES_PASSWORD: peblo123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://peblo:peblo123@db:5432/peblo
+      STORAGE_TYPE: local
+    volumes:
+      - ./data:/app/data
+volumes:
+  pgdata:
