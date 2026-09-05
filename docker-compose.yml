@@ -3,23 +3,29 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: peblo
       POSTGRES_USER: peblo
       POSTGRES_PASSWORD: peblo123
+      POSTGRES_DB: peblo
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peblo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build: ./api
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
       DATABASE_URL: postgresql://peblo:peblo123@db:5432/peblo
-      STORAGE_TYPE: local
-    volumes:
-      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
 volumes:
   pgdata:
