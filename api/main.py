@@ -39,7 +39,9 @@ def get_db():
         yield db
     finally:
         db.close()
-
+@app.get("/health")
+def health():
+    return {"status": "ok", "catalogue_version": "v1"}
 @app.on_event("startup")
 def startup():
     # This fixes your 500 error - deletes old table
